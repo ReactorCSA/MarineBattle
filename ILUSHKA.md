@@ -1,5 +1,4 @@
 Привет броу
 
 Дароу броу че как
-
-1asdasd
+short cut govno
