@@ -1,9 +1,6 @@
-interface Props {
-  isFilled: boolean;
-  isDamaged: boolean;
-}
+import { CellState } from '~/interface';
 
-export function CellContent({isFilled, isDamaged}: Props) {
+export function CellContent({isFilled, isDamaged}: CellState) {
   if (isDamaged) {
     return 'X';
   }
