@@ -1,6 +1,6 @@
-import { CellState } from '~/interface';
+import { ICellState } from '~/interface';
 
-export function CellContent({isFilled, isDamaged}: CellState) {
+export function CellContent({isFilled, isDamaged}: ICellState) {
   if (isDamaged) {
     return 'X';
   }
