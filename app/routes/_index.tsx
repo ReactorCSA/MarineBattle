@@ -96,7 +96,7 @@ export default function Index() {
     });
 
     setShips(newShips);
-  },[ships]);
+  }, [ships]);
 
   const filledCells: ICell[] = useMemo(() => {
     return ships.map((ship) => ship.cells).flat();
