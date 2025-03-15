@@ -1,6 +1,6 @@
-import { CellContent } from './components/CellContent/CellContent';
-import {ICell, ICellState} from "~/interface";
 import {useCallback, useMemo} from "react";
+import {ICell, ICellState} from "~/interface";
+import { CellContent } from '../CellContent/CellContent';
 
 interface Props {
   id: number;
