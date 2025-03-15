@@ -82,7 +82,7 @@ export default function Index() {
 
     const newShips = ships.map((item) => {
       if (item.id === currentShip.item?.id) {
-        return currentShip.item
+        return currentShip.item;
       }
       return item;
     })
