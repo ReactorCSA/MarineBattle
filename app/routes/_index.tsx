@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import type { MetaFunction } from "@remix-run/node";
 import { Cell } from '~/components/Cell/Cell';
 import {ICell, ICellBase, IShip} from "~/interface";
@@ -37,66 +37,74 @@ export default function Index() {
     {
       id: 428,
       cells: [
-        {id: 24, coordinates: [5, 5], isFilled: true, isDamaged: false},
-        {id: 34, coordinates: [5, 6], isFilled: true, isDamaged: false},
-        {id: 44, coordinates: [5, 7], isFilled: true, isDamaged: false},
+        {id: 24, coordinates: [5, 5], isDamaged: false, isFilled: true},
+        {id: 34, coordinates: [5, 6], isDamaged: false, isFilled: true},
+        {id: 44, coordinates: [5, 7], isDamaged: false, isFilled: true},
       ],
     },
     {
       id: 411,
       cells: [
-        {id: 81, coordinates: [3, 0], isFilled: true, isDamaged: false},
-        {id: 82, coordinates: [4, 0], isFilled: true, isDamaged: false},
-        {id: 83, coordinates: [5, 0], isFilled: true, isDamaged: false},
-        {id: 84, coordinates: [6, 0], isFilled: true, isDamaged: false},
+        {id: 81, coordinates: [3, 0], isDamaged: false, isFilled: true},
+        {id: 82, coordinates: [4, 0], isDamaged: false, isFilled: true},
+        {id: 83, coordinates: [5, 0], isDamaged: false, isFilled: true},
+        {id: 84, coordinates: [6, 0], isDamaged: false, isFilled: true},
       ],
     },
   ]);
 
-  const handleCellClick = (id: number) => {
-    const currentCell: { item: ICell | null } = {item: null};
-    const currentShip: { item: IShip | null } = {item: null};
+  const handleCellClick = useCallback((cell: ICell | undefined) => {
+    let currentShip: IShip;
+
+    if (cell === undefined) {
+      return;
+    }
 
     ships.forEach((ship) => {
       ship.cells.forEach((shipCell) => {
-        if (shipCell.id === id) {
-          currentCell.item = shipCell;
-          currentShip.item = ship;
+        if (shipCell.id === cell.id) {
+          currentShip = ship;
         }
-      })
-    })
+      });
+    });
 
-    if (currentShip.item === null || currentCell.item === null) {
-      return
+    if (!currentShip) {
+      return;
     }
 
-    currentShip.item.cells = currentShip.item.cells.map((item) => {
-      if (item.id === currentCell.item?.id) {
+    if (cell.isDamaged) {
+      return;
+    }
+
+    currentShip.cells = currentShip.cells.map((item) => {
+      if (item.id === cell.id) {
         return {
           ...item,
           isDamaged: true,
         }
       }
+
       return item;
     });
 
     const newShips = ships.map((item) => {
-      if (item.id === currentShip.item?.id) {
-        return currentShip.item
+      if (item.id === currentShip.id) {
+        return currentShip;
       }
+
       return item;
-    })
+    });
+
     setShips(newShips);
-  };
+  },[ships]);
 
   const filledCells: ICell[] = useMemo(() => {
     return ships.map((ship) => ship.cells).flat();
   }, [ships]);
 
-  console.log(ships);
   return (
     <div className="flex h-screen items-center justify-center">
-      <div className="grid grid-cols-10 grid-rows-10">
+      <div className="grid grid-cols-10 grid-rows-10 cursor-pointer">
         {battleFieldCoordinates.map(({id}, index) => (
           <Cell key={index} filledCells={filledCells} id={id} onClick={handleCellClick} />
         ))}
