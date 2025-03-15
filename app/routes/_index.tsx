@@ -67,7 +67,7 @@ export default function Index() {
     })
 
     if (currentShip.item === null || currentCell.item === null) {
-      return
+      return;
     }
 
     currentShip.item.cells = currentShip.item.cells.map((item) => {
