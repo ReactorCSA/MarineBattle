@@ -1,7 +1,8 @@
-import { useMemo, useState, useCallback } from 'react';
 import type { MetaFunction } from "@remix-run/node";
-import { Cell } from '~/components/Cell/Cell';
+import { useMemo, useState, useCallback } from 'react';
+import { getShipWithDamagedCellByID, isShipDamaged, isShipSunk } from '~/features/Ship';
 import {ICell, ICellBase, IShip} from "~/interface";
+import { Cell } from '~/features/Cell';
 
 export const meta: MetaFunction = () => {
   return [
@@ -54,7 +55,7 @@ export default function Index() {
   ]);
 
   const handleCellClick = useCallback((cell: ICell | undefined) => {
-    let currentShip: IShip;
+    let currentShipID: IShip['id'] | null = null;
 
     if (cell === undefined) {
       return;
@@ -63,12 +64,13 @@ export default function Index() {
     ships.forEach((ship) => {
       ship.cells.forEach((shipCell) => {
         if (shipCell.id === cell.id) {
-          currentShip = ship;
+          currentShipID = ship.id;
+          return;
         }
       });
     });
 
-    if (!currentShip) {
+    if (currentShipID === null) {
       return;
     }
 
@@ -76,20 +78,9 @@ export default function Index() {
       return;
     }
 
-    currentShip.cells = currentShip.cells.map((item) => {
-      if (item.id === cell.id) {
-        return {
-          ...item,
-          isDamaged: true,
-        }
-      }
-
-      return item;
-    });
-
     const newShips = ships.map((item) => {
-      if (item.id === currentShip.id) {
-        return currentShip;
+      if (item.id === currentShipID) {
+        return getShipWithDamagedCellByID(item, cell.id);
       }
 
       return item;
@@ -102,8 +93,27 @@ export default function Index() {
     return ships.map((ship) => ship.cells).flat();
   }, [ships]);
 
+  const gameScore = useMemo(() => {
+    const total = ships.length;
+    const sunk = ships.filter(isShipSunk).length;
+    const damaged = ships.filter(isShipDamaged).length;
+
+    return {
+      total,
+      sunk,
+      damaged,
+    }
+  }, [ships]);
+
   return (
-    <div className="flex h-screen items-center justify-center">
+    <div className="flex flex-col space-y-6 h-screen items-center justify-center">
+      <div className="flex flex-col items-center">
+        <div className="flex gap-4">
+          <div>Кораблей: {gameScore.total}</div>
+          <div>Потоплено: {gameScore.sunk}</div>
+          <div>Повреждено: {gameScore.damaged}</div>
+        </div>
+      </div>
       <div className="grid grid-cols-10 grid-rows-10 cursor-pointer">
         {battleFieldCoordinates.map(({id}, index) => (
           <Cell key={index} filledCells={filledCells} id={id} onClick={handleCellClick} />
