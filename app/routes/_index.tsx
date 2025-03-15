@@ -75,7 +75,7 @@ export default function Index() {
         return {
           ...item,
           isDamaged: true,
-        }
+        };
       }
       return item;
     });
