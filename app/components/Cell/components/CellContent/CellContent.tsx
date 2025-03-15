@@ -1,11 +1,15 @@
-import { CellState } from '~/interface';
+import { ICellState } from '~/interface';
 
-export function CellContent({isFilled, isDamaged}: CellState) {
-  if (isDamaged) {
+interface Props {
+  state: ICellState;
+}
+
+export function CellContent({state}: Props) {
+  if (state.isDamaged) {
     return 'X';
   }
 
-  if (isFilled) {
+  if (state.isFilled) {
     return '[ ]';
   }
 

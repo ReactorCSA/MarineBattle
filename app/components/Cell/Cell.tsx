@@ -1,26 +1,39 @@
 import { CellContent } from './components/CellContent/CellContent';
+import {ICell, ICellState} from "~/interface";
+import {useCallback, useMemo} from "react";
 
 interface Props {
-  filledCells: {
-    id: number;
-    coordinates: number[];
-    isDamaged: boolean;
-  }[];
-  row: number
-  column: number;
+  id: number;
+  filledCells: ICell[];
+  onClick: (cell: ICell | undefined) => void;
 }
 
-export function Cell({filledCells, row, column}: Props) {
-  const cellInList = filledCells.find(({coordinates: [cx, cy]}) => (
-    cx === row && cy === column
-  ));
+export function Cell({id, filledCells, onClick}: Props) {
+  const cellInList: ICell | undefined = useMemo(() => {
+    return filledCells.find((filledCell) => id === filledCell.id);
+  },[filledCells]);
 
-  const isFilled = cellInList !== undefined;
-  const isDamaged = isFilled && cellInList.isDamaged;
+  const cellState: ICellState = useMemo(() => {
+    if (cellInList === undefined) {
+      return {
+        isFilled: false,
+        isDamaged: false,
+      }
+    }
+
+    return {
+      isFilled: cellInList.isFilled,
+      isDamaged: cellInList.isDamaged,
+    }
+  },[cellInList]);
+
+  const handleClick = useCallback(() => {
+    onClick(cellInList);
+  }, [cellInList, onClick]);
 
   return (
-    <div className="flex items-center justify-center w-12 h-12 border border-black">
-      <CellContent isDamaged={isDamaged} isFilled={isFilled} />
+    <div className="flex items-center justify-center w-12 h-12 border border-black" onClick={handleClick}>
+      <CellContent state={cellState} />
     </div>
   );
 }
